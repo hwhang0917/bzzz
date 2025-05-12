@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Color from "color";
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
+import { useWindowSize } from "../composables/useWindowSize";
 
 interface Position {
   x: number;
@@ -34,6 +35,8 @@ const colors = computed(() => {
   });
 });
 
+const { width, height } = useWindowSize();
+
 onMounted(() => {
   initCanvas();
 });
@@ -46,14 +49,17 @@ const initCanvas = () => {
     console.error("Canvas element not found.");
     return;
   }
-  canvasRef.value.width = window.innerWidth;
-  canvasRef.value.height = window.innerHeight;
+  canvasRef.value.width = width.value;
+  canvasRef.value.height = height.value;
   ctx.value = canvasRef.value.getContext("2d");
   if (!ctx.value) return;
   ctx.value.lineCap = "round";
   ctx.value.lineJoin = "round";
   render(0);
 };
+watch(() => width.value, initCanvas);
+watch(() => height.value, initCanvas);
+
 const startRippling = () => {
   isRippling.value = true;
   currentRippleLevel.value = 0;
