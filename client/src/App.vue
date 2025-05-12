@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted } from "vue";
 import Canvas from "./components/Canvas.vue";
+import EmojiMenu from "./components/EmojiMenu.vue";
 
 const onContextMenu = (e: Event) => e.preventDefault();
 
@@ -19,5 +20,6 @@ onBeforeUnmount(() => {
 <template>
   <main class="h-screen w-screen">
     <Canvas />
+    <EmojiMenu />
   </main>
 </template>

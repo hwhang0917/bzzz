@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import Color from "color";
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
+import {
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  reactive,
+  ref,
+  watch,
+} from "vue";
 import { useWindowSize } from "../composables/useWindowSize";
+import clickSfx from "../assets/click.wav";
+import { useSound } from "@vueuse/sound";
 
 interface Position {
   x: number;
@@ -12,8 +21,8 @@ interface CanvasProps {
 }
 const { rippleColor = "#3c40c6" } = defineProps<CanvasProps>();
 
-const rippleSize = 200;
-const rippleLevel = 20;
+const rippleSize = 500;
+const rippleLevel = 25;
 const rippleInterval = 30;
 
 const canvasRef = ref<HTMLCanvasElement | null>(null);
@@ -22,6 +31,9 @@ const animationId = ref<number>();
 const isRippling = ref<boolean>(false);
 const position = reactive<Position>({ x: 0, y: 0 });
 const currentRippleLevel = ref<number>(0);
+
+const { play } = useSound(clickSfx, { volume: 0.2 });
+
 const sizes = computed(() => {
   const increment = rippleSize / (rippleLevel - 1);
   return Array.from({ length: rippleLevel }, (_, i) => {
@@ -64,6 +76,7 @@ const startRippling = () => {
   isRippling.value = true;
   currentRippleLevel.value = 0;
   lastRippleTime = 0;
+  play();
 };
 const stopRippling = () => {
   isRippling.value = false;
@@ -140,6 +153,5 @@ const render = (timestamp: DOMHighResTimeStamp) => {
 .canvas {
   width: 100%;
   height: 100%;
-  cursor: pointer;
 }
 </style>

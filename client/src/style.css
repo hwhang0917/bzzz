@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap');
 @import "tailwindcss";
 
 @font-face {
@@ -10,4 +11,5 @@
 
 @theme {
   --font-pretendard: "Pretendard-Regular", sans-serif;
+  --font-emoji: "Noto Color Emoji", sans-serif;
 }
