@@ -1,26 +1,24 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import BuzzCanvas from "./components/BuzzCanvas.vue";
 import EmojiCanvas from "./components/EmojiCanvas.vue";
 import EmojiMenu from "./components/EmojiMenu.vue";
 import { provideHoverState } from "./composables/useHoverState";
 import type { Emoji } from "./constants";
 
-const onContextMenu = (e: Event) => e.preventDefault();
+const emojiCanvasRef = ref<InstanceType<typeof EmojiCanvas> | null>(null);
 
 onMounted(() => {
-  if (typeof window !== "undefined") {
-    window.addEventListener("contextmenu", onContextMenu);
-  }
+  window.addEventListener("contextmenu", onContextMenu);
 });
 onBeforeUnmount(() => {
-  if (typeof window !== "undefined") {
-    window.removeEventListener("contextmenu", onContextMenu);
-  }
+  window.removeEventListener("contextmenu", onContextMenu);
 });
 
+const onContextMenu = (e: Event) => e.preventDefault();
 const dispatchEmoji = (emoji: Emoji) => {
-  console.log(emoji.value);
+  if (!emojiCanvasRef.value) return;
+  emojiCanvasRef.value.dropEmoji(emoji);
 };
 
 provideHoverState();
@@ -29,7 +27,7 @@ provideHoverState();
 <template>
   <main class="h-screen w-screen">
     <BuzzCanvas />
-    <EmojiCanvas />
+    <EmojiCanvas ref="emojiCanvasRef" />
     <EmojiMenu @dispatch-emoji="dispatchEmoji" />
   </main>
 </template>

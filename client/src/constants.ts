@@ -2,6 +2,7 @@ export interface Emoji {
   key: string;
   value: string;
 }
+
 export const EMOJIS: Emoji[] = [
   { key: "smile", value: "😃" },
   { key: "laugh", value: "😁" },
@@ -11,3 +12,5 @@ export const EMOJIS: Emoji[] = [
   { key: "bored", value: "😒" },
   { key: "heart", value: "❤️" },
 ];
+
+export const EMOJI_MAP = new Map(EMOJIS.map((e) => [e.key, e.value]));

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Color from "color";
 import {
   computed,
   onBeforeUnmount,
@@ -17,13 +18,16 @@ interface Position {
   y: number;
 }
 interface CanvasProps {
-  rippleColor?: string;
+  color?: string;
 }
-const { rippleColor = "#3c40c6" } = defineProps<CanvasProps>();
+const { color = "#3c40c6" } = defineProps<CanvasProps>();
 
 const isMobile = computed(() => width.value < 800);
 const rippleSize = computed(() => (isMobile.value ? 150 : 100));
 const rippleIncrement = computed(() => (isMobile.value ? 10 : 5));
+const rippleColor = computed(() =>
+  new Color(color).fade(0.2).string(),
+);
 const rippleInterval = 30;
 
 const canvasRef = ref<HTMLCanvasElement | null>(null);
@@ -50,6 +54,7 @@ const initCanvas = () => {
     console.error("Canvas element not found.");
     return;
   }
+  console.log(rippleColor.value);
   canvasRef.value.width = width.value;
   canvasRef.value.height = height.value;
   ctx.value = canvasRef.value.getContext("2d");
@@ -118,7 +123,7 @@ const drawRipple = (size: number) => {
 
   ctx.value.beginPath();
   ctx.value.arc(position.x, position.y, size / 2, 0, Math.PI * 2);
-  ctx.value.fillStyle = rippleColor;
+  ctx.value.fillStyle = rippleColor.value;
   ctx.value.fill();
 };
 const clearCanvas = () => {
