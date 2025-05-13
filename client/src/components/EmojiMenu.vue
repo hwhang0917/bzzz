@@ -1,11 +1,43 @@
 <script setup lang="ts">
-const EMOJIS = ["😃", "😁", "🤣", "😜", "😱", "😒"];
+import { useSound } from "@vueuse/sound";
+import { useHoverState } from "../composables/useHoverState";
+import { EMOJIS, type Emoji } from "../constants";
+import clickSfx from "../assets/click.wav";
+
+const { setHovering } = useHoverState();
+const { play, stop } = useSound(clickSfx, { volume: 0.2 });
+const emit = defineEmits(["dispatchEmoji"]);
+
+const onMouseEnter = () => {
+  play({ playbackRate: 1 });
+  setHovering(true);
+};
+const onMouseLeave = () => {
+  stop();
+  setHovering(false);
+};
+const click = (emoji: Emoji) => {
+  if (!!navigator.vibrate) {
+    navigator.vibrate(50);
+  }
+  play({ playbackRate: 1.5 });
+  emit("dispatchEmoji", emoji);
+};
 </script>
 
 <template>
-  <ul class="fixed bottom-10 mx-auto flex justify-center text-5xl select-none">
-    <li v-for="emoji in EMOJIS" class="font-emoji cursor-pointer">
-      {{ emoji }}
+  <ul
+    class="fixed justify-center rounded-4xl border-2 border-stone-400 bg-neutral-100 p-2 shadow-lg select-none max-sm:top-1/2 max-sm:right-5 max-sm:-translate-y-1/2 md:bottom-10 md:left-1/2 md:flex md:-translate-x-1/2 md:border-4"
+  >
+    <li v-for="emoji in EMOJIS" class="font-emoji text-3xl md:text-5xl">
+      <button
+        class="my-2 cursor-pointer duration-100 active:scale-150 md:my-0 md:hover:scale-110 md:active:scale-125"
+        @mouseenter="onMouseEnter"
+        @mouseleave="onMouseLeave"
+        @click="() => click(emoji)"
+      >
+        {{ emoji.value }}
+      </button>
     </li>
   </ul>
 </template>

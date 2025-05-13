@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Color from "color";
 import {
   computed,
   onBeforeUnmount,
@@ -8,9 +7,10 @@ import {
   ref,
   watch,
 } from "vue";
-import { useWindowSize } from "../composables/useWindowSize";
-import clickSfx from "../assets/click.wav";
+import { useWindowSize } from "@vueuse/core";
 import { useSound } from "@vueuse/sound";
+import bubbleSfx from "../assets/bubble.wav";
+import { useHoverState } from "../composables/useHoverState";
 
 interface Position {
   x: number;
@@ -21,8 +21,9 @@ interface CanvasProps {
 }
 const { rippleColor = "#3c40c6" } = defineProps<CanvasProps>();
 
-const rippleSize = 500;
-const rippleLevel = 25;
+const isMobile = computed(() => width.value < 800);
+const rippleSize = computed(() => (isMobile.value ? 150 : 100));
+const rippleIncrement = computed(() => (isMobile.value ? 10 : 5));
 const rippleInterval = 30;
 
 const canvasRef = ref<HTMLCanvasElement | null>(null);
@@ -30,23 +31,11 @@ const ctx = ref<CanvasRenderingContext2D | null>();
 const animationId = ref<number>();
 const isRippling = ref<boolean>(false);
 const position = reactive<Position>({ x: 0, y: 0 });
-const currentRippleLevel = ref<number>(0);
+const currentRippleSize = ref<number>(0);
+const vibrationInterval = ref<number>();
 
-const { play } = useSound(clickSfx, { volume: 0.2 });
-
-const sizes = computed(() => {
-  const increment = rippleSize / (rippleLevel - 1);
-  return Array.from({ length: rippleLevel }, (_, i) => {
-    return 1 + increment * i;
-  });
-});
-const colors = computed(() => {
-  const hsl = Color(rippleColor).hsl();
-  return Array.from({ length: rippleLevel }, (_, i) => {
-    return hsl.lighten(0.1 * (i + 1)).hex();
-  });
-});
-
+const { play, stop } = useSound(bubbleSfx, { volume: 0.2 });
+const { isHovering: isEmojiMenuHovering } = useHoverState();
 const { width, height } = useWindowSize();
 
 onMounted(() => {
@@ -69,18 +58,41 @@ const initCanvas = () => {
   ctx.value.lineJoin = "round";
   render(0);
 };
-watch(() => width.value, initCanvas);
-watch(() => height.value, initCanvas);
-
-const startRippling = () => {
-  isRippling.value = true;
-  currentRippleLevel.value = 0;
-  lastRippleTime = 0;
-  play();
+const updatePosition = (clientX: number, clientY: number) => {
+  if (!canvasRef.value) return;
+  const rect = canvasRef.value.getBoundingClientRect();
+  position.x = clientX - rect.left;
+  position.y = clientY - rect.top;
 };
-const stopRippling = () => {
+const startVibrating = () => {
+  if (!navigator.vibrate) return;
+  if (vibrationInterval.value) clearInterval(vibrationInterval.value);
+  vibrationInterval.value = setInterval(() => {
+    navigator.vibrate(rippleInterval);
+  }, rippleInterval);
+};
+const stopVibrating = () => {
+  if (!vibrationInterval.value) return;
+  clearInterval(vibrationInterval.value);
+};
+const startRippling = (e: unknown) => {
+  if (e instanceof TouchEvent) {
+    startVibrating();
+    updatePosition(e.touches[0]?.clientX || 0, e.touches[0]?.clientY || 0);
+  }
+  if (!isRippling.value) play();
+  isRippling.value = true;
+  currentRippleSize.value = 0;
+  lastRippleTime = 0;
+};
+const stopRippling = (e: unknown) => {
+  if (e instanceof TouchEvent) {
+    stopVibrating();
+  }
+  clearCanvas();
   isRippling.value = false;
-  currentRippleLevel.value = 0;
+  currentRippleSize.value = 0;
+  stop();
 };
 const changePosition = (e: MouseEvent | TouchEvent) => {
   clearCanvas();
@@ -90,7 +102,6 @@ const changePosition = (e: MouseEvent | TouchEvent) => {
     return;
   }
 
-  const rect = canvasRef.value.getBoundingClientRect();
   let clientX, clientY;
   if (e instanceof MouseEvent) {
     clientX = e.clientX;
@@ -100,19 +111,15 @@ const changePosition = (e: MouseEvent | TouchEvent) => {
     clientY = e.touches[0]?.clientY || 0;
   }
 
-  position.x = clientX - rect.left;
-  position.y = clientY - rect.top;
+  updatePosition(clientX, clientY);
 };
-const drawRipple = () => {
+const drawRipple = (size: number) => {
   if (!ctx.value) return;
 
-  const level = Math.min(currentRippleLevel.value, rippleLevel - 1);
-  for (let i = level; i >= 0; i--) {
-    ctx.value.beginPath();
-    ctx.value.arc(position.x, position.y, sizes.value[i] / 2, 0, Math.PI * 2);
-    ctx.value.fillStyle = colors.value[i];
-    ctx.value.fill();
-  }
+  ctx.value.beginPath();
+  ctx.value.arc(position.x, position.y, size / 2, 0, Math.PI * 2);
+  ctx.value.fillStyle = rippleColor;
+  ctx.value.fill();
 };
 const clearCanvas = () => {
   if (!canvasRef.value || !ctx.value) return;
@@ -124,16 +131,20 @@ const render = (timestamp: DOMHighResTimeStamp) => {
 
   if (ctx.value && isRippling.value) {
     if (timestamp - lastRippleTime > rippleInterval) {
-      currentRippleLevel.value++;
-      if (currentRippleLevel.value >= rippleLevel) {
-        currentRippleLevel.value = 0;
+      currentRippleSize.value += rippleIncrement.value;
+      if (currentRippleSize.value >= rippleSize.value) {
+        currentRippleSize.value = 0;
       }
       lastRippleTime = timestamp;
     }
-    drawRipple();
+    drawRipple(currentRippleSize.value);
   }
   animationId.value = requestAnimationFrame(render);
 };
+
+watch(() => width.value, initCanvas);
+watch(() => height.value, initCanvas);
+watch(() => isEmojiMenuHovering.value, stopRippling);
 </script>
 
 <template>
@@ -151,7 +162,9 @@ const render = (timestamp: DOMHighResTimeStamp) => {
 
 <style scoped>
 .canvas {
+  position: fixed;
   width: 100%;
   height: 100%;
+  background-color: transparent;
 }
 </style>
