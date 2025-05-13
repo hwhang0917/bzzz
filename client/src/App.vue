@@ -3,6 +3,7 @@ import { onBeforeUnmount, onMounted, ref } from "vue";
 import BuzzCanvas from "./components/BuzzCanvas.vue";
 import EmojiCanvas from "./components/EmojiCanvas.vue";
 import EmojiMenu from "./components/EmojiMenu.vue";
+import Footer from "./components/Footer.vue";
 import { provideHoverState } from "./composables/useHoverState";
 import type { Emoji } from "./constants";
 
@@ -30,4 +31,5 @@ provideHoverState();
     <EmojiCanvas ref="emojiCanvasRef" />
     <EmojiMenu @dispatch-emoji="dispatchEmoji" />
   </main>
+  <Footer />
 </template>

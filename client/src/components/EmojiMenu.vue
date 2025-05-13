@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useSound } from "@vueuse/sound";
+import { Github } from "lucide-vue-next";
 import { useHoverState } from "../composables/useHoverState";
 import { EMOJIS, type Emoji } from "../constants";
 import clickSfx from "../assets/click.wav";
@@ -16,12 +17,12 @@ const onMouseLeave = () => {
   stop();
   setHovering(false);
 };
-const click = (emoji: Emoji) => {
+const click = (emoji?: Emoji) => {
   if (!!navigator.vibrate) {
     navigator.vibrate(50);
   }
   play({ playbackRate: 1.5 });
-  emit("dispatchEmoji", emoji);
+  if (emoji) emit("dispatchEmoji", emoji);
 };
 </script>
 
@@ -38,6 +39,17 @@ const click = (emoji: Emoji) => {
       >
         {{ emoji.value }}
       </button>
+    </li>
+    <li class="font-mono text-5xl text-stone-400 max-sm:hidden">|</li>
+    <li
+      class="font-mono text-3xl duration-100 active:scale-150 max-sm:hidden md:text-5xl md:hover:scale-110 md:active:scale-125"
+      @mouseenter="onMouseEnter"
+      @mouseleave="onMouseLeave"
+      @click="() => click()"
+    >
+      <a href="https://github.com/hwhang0917/bzzz" target="_blank">
+        <Github :size="48" />
+      </a>
     </li>
   </ul>
 </template>
