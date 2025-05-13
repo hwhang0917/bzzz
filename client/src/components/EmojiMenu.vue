@@ -33,6 +33,8 @@ const click = (emoji?: Emoji) => {
     <li v-for="emoji in EMOJIS" class="font-emoji text-3xl md:text-5xl">
       <button
         class="my-2 cursor-pointer duration-100 active:scale-150 md:my-0 md:hover:scale-110 md:active:scale-125"
+        :aria-label="`Send ${emoji.value} emoji to others (${emoji.descriptor}).`"
+        :title="emoji.descriptor"
         @mouseenter="onMouseEnter"
         @mouseleave="onMouseLeave"
         @click="() => click(emoji)"
@@ -47,7 +49,11 @@ const click = (emoji?: Emoji) => {
       @mouseleave="onMouseLeave"
       @click="() => click()"
     >
-      <a href="https://github.com/hwhang0917/bzzz" target="_blank">
+      <a
+        href="https://github.com/hwhang0917/bzzz"
+        target="_blank"
+        aria-label="Go to Github link"
+      >
         <Github :size="48" />
       </a>
     </li>

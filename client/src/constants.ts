@@ -1,16 +1,16 @@
 export interface Emoji {
-  key: string;
+  descriptor: string;
   value: string;
 }
 
 export const EMOJIS: Emoji[] = [
-  { key: "smile", value: "😃" },
-  { key: "laugh", value: "😁" },
-  { key: "lol", value: "🤣" },
-  { key: "wink", value: "😜" },
-  { key: "shock", value: "😱" },
-  { key: "bored", value: "😒" },
-  { key: "heart", value: "❤️" },
+  { descriptor: "Grinning face", value: "😃" },
+  { descriptor: "Beaming face with smiling eyes", value: "😁" },
+  { descriptor: "Rolling on the floor laughing", value: "🤣" },
+  { descriptor: "Winking face with tongue", value: "😜" },
+  { descriptor: "Face screaming in fear", value: "😱" },
+  { descriptor: "Unamused face", value: "😒" },
+  { descriptor: "Red heard", value: "❤️" },
 ];
 
-export const EMOJI_MAP = new Map(EMOJIS.map((e) => [e.key, e.value]));
+export const EMOJI_MAP = new Map(EMOJIS.map((e) => [e.descriptor, e.value]));

@@ -25,9 +25,7 @@ const { color = "#3c40c6" } = defineProps<CanvasProps>();
 const isMobile = computed(() => width.value < 800);
 const rippleSize = computed(() => (isMobile.value ? 150 : 100));
 const rippleIncrement = computed(() => (isMobile.value ? 10 : 5));
-const rippleColor = computed(() =>
-  new Color(color).fade(0.2).string(),
-);
+const rippleColor = computed(() => new Color(color).fade(0.2).string());
 const rippleInterval = 30;
 
 const canvasRef = ref<HTMLCanvasElement | null>(null);
@@ -156,6 +154,7 @@ watch(() => isEmojiMenuHovering.value, stopRippling);
   <canvas
     ref="canvasRef"
     class="canvas"
+    aria-label="Click to send vibration or sound."
     @mousedown="startRippling"
     @mouseup="stopRippling"
     @mousemove="changePosition"
