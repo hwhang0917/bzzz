@@ -13,5 +13,3 @@ export const EMOJIS: Emoji[] = [
   { descriptor: "Loudly Crying Face", value: "😭" },
   { descriptor: "Red heard", value: "❤️" },
 ];
-
-export const EMOJI_MAP = new Map(EMOJIS.map((e) => [e.descriptor, e.value]));
