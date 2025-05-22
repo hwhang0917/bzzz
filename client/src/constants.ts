@@ -10,6 +10,7 @@ export const EMOJIS: Emoji[] = [
   { descriptor: "Winking face with tongue", value: "😜" },
   { descriptor: "Face screaming in fear", value: "😱" },
   { descriptor: "Unamused face", value: "😒" },
+  { descriptor: "Loudly Crying Face", value: "😭" },
   { descriptor: "Red heard", value: "❤️" },
 ];
 

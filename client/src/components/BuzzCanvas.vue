@@ -105,7 +105,7 @@ const stopRippling = (e: unknown) => {
   currentRippleSize.value = 0;
   stop();
 };
-const changePosition = (e: MouseEvent) => {
+const changePosition = (e: MouseEvent | TouchEvent) => {
   clearCanvas();
   if (!canvasRef.value) {
     position.x = 0;
@@ -113,11 +113,12 @@ const changePosition = (e: MouseEvent) => {
     return;
   }
 
-  let clientX, clientY;
+  let clientX: number = 0;
+  let clientY: number = 0;
   if (typeof TouchEvent !== "undefined" && e instanceof TouchEvent) {
     clientX = e.touches[0]?.clientX || 0;
     clientY = e.touches[0]?.clientY || 0;
-  } else {
+  } else if (e instanceof MouseEvent){
     clientX = e.clientX;
     clientY = e.clientY;
   }
@@ -161,7 +162,6 @@ watch(() => isEmojiMenuHovering.value, stopRippling);
   <canvas
     ref="canvasRef"
     class="canvas"
-    aria-label="Click to send vibration or sound."
     @mousedown="startRippling"
     @mouseup="stopRippling"
     @mousemove="changePosition"

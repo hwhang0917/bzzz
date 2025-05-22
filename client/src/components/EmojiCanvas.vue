@@ -4,11 +4,12 @@ import { useWindowSize } from "@vueuse/core";
 import type { Emoji } from "../constants";
 import Ball from "../elements/Ball";
 
-const GRAVITY = 0.05;
+const GRAVITY = 0.15;
 const FRICTION = 0.65;
 const EMOJI_SCALE = 1.9;
 const VERTICAL_OFFSET = -0.18;
 const BALL_LIFETIME_MS = 7_000;
+const MAX_ELEMENTS = 20;
 
 const SHADOW_COLOR = "rgba(0, 0, 0, 0.3)";
 const SHADOW_BLUR = 6;
@@ -35,8 +36,7 @@ onUnmounted(() => {
 
 const { width, height } = useWindowSize();
 const isMobile = computed(() => width.value < 800);
-const maxElements = computed(() => (isMobile.value ? 20 : 50));
-const emojiRadius = computed(() => (isMobile.value ? 20 : 100));
+const emojiRadius = computed(() => (isMobile.value ? 50 : 100));
 
 const resizeCanvas = () => {
   if (!canvasRef.value) return;
@@ -93,12 +93,20 @@ const drawBall = (ball: Ball<string>, debug = false) => {
   } else {
     textHeight = fontSize * 0.7;
   }
+
+  ctx.value.save();
+
+  ctx.value.translate(ball.x, ball.y);
+  ctx.value.rotate((ball.rotation * Math.PI) / 180);
+
   const verticalAdjustment = fontSize * VERTICAL_OFFSET;
   ctx.value.fillText(
     ball.content,
-    ball.x - metrics.width / 2,
-    ball.y + textHeight / 2 + verticalAdjustment,
+    -metrics.width / 2,
+    textHeight / 2 + verticalAdjustment,
   );
+
+  ctx.value.restore();
 
   ctx.value.shadowColor = "transparent";
   ctx.value.shadowBlur = 0;
@@ -131,6 +139,7 @@ const render = (ts: number) => {
   emojiBalls.value.forEach((ball) => {
     if (ball.y + ball.radius + ball.dy > canvasRef.value!.height) {
       ball.dy = -ball.dy * FRICTION;
+      ball.dr = ball.dr * FRICTION;
     } else {
       ball.dy += GRAVITY;
     }
@@ -140,10 +149,13 @@ const render = (ts: number) => {
       ball.x - ball.radius + ball.dx < 0
     ) {
       ball.dx = -ball.dx;
+      ball.dr = ball.dr * FRICTION;
     }
 
     ball.x += ball.dx;
     ball.y += ball.dy;
+    ball.rotation += ball.dr;
+
     drawBall(ball);
   });
   animationId.value = requestAnimationFrame(render);
@@ -151,7 +163,7 @@ const render = (ts: number) => {
 
 const dropEmoji = (emoji: Emoji) => {
   if (!canvasRef.value || !ctx.value) return;
-  if (emojiBalls.value.length > maxElements.value) {
+  if (emojiBalls.value.length > MAX_ELEMENTS) {
     emojiBalls.value.shift();
   }
   emojiBalls.value.push(

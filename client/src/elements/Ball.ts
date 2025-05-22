@@ -13,6 +13,7 @@ class Ball<T = unknown> {
   public y: number;
   public dx: number;
   public dy: number;
+  public dr: number;
   public rotation: number;
   public opacity: number;
   public readonly radius: number;
@@ -24,6 +25,7 @@ class Ball<T = unknown> {
     this.y = -100;
     this.dx = randomInt(-2, 2);
     this.dy = randomInt(-2, 2);
+    this.dr = randomInt(-2, 2);
     this.rotation = randomInt(0, 360);
     this.opacity = 1.0;
     this.radius = radius;
