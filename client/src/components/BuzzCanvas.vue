@@ -79,7 +79,7 @@ const stopVibrating = () => {
   clearInterval(vibrationInterval.value);
 };
 const startRippling = (e: unknown) => {
-  if (e instanceof TouchEvent) {
+  if (typeof TouchEvent !== "undefined" && e instanceof TouchEvent) {
     startVibrating();
     updatePosition(e.touches[0]?.clientX || 0, e.touches[0]?.clientY || 0);
   }
@@ -89,7 +89,7 @@ const startRippling = (e: unknown) => {
   lastRippleTime = 0;
 };
 const stopRippling = (e: unknown) => {
-  if (e instanceof TouchEvent) {
+  if (typeof TouchEvent !== "undefined" && e instanceof TouchEvent) {
     stopVibrating();
   }
   clearCanvas();

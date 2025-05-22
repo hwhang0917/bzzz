@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useWindowSize } from "@vueuse/core";
 import type { Emoji } from "../constants";
 import Ball from "../elements/Ball";
@@ -8,32 +8,55 @@ const GRAVITY = 0.05;
 const FRICTION = 0.65;
 const EMOJI_SCALE = 1.9;
 const VERTICAL_OFFSET = -0.18;
-const BALL_LIFETIME_MS = 5000;
+const BALL_LIFETIME_MS = 7_000;
 
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const ctx = ref<CanvasRenderingContext2D | null>();
-const animationId = ref<number>();
+const animationId = ref<number | null>(null);
 const emojiBalls = ref<Array<Ball<string>>>([]);
 
 onMounted(() => {
   initCanvas();
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+});
+onUnmounted(() => {
+  if (animationId.value) {
+    cancelAnimationFrame(animationId.value);
+    animationId.value = null;
+  }
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
 });
 
 const { width, height } = useWindowSize();
 const isMobile = computed(() => width.value < 800);
-const maxElements = computed(() => (isMobile.value ? 50 : 300));
+const maxElements = computed(() => (isMobile.value ? 20 : 50));
 const emojiRadius = computed(() => (isMobile.value ? 20 : 100));
+
+const resizeCanvas = () => {
+  if (!canvasRef.value) return;
+  canvasRef.value.width = width.value;
+  canvasRef.value.height = height.value;
+};
+watch([width, height], resizeCanvas);
 
 const initCanvas = () => {
   if (!canvasRef.value) {
     console.error("Canvas element not found.");
     return;
   }
-  canvasRef.value.width = width.value;
-  canvasRef.value.height = height.value;
+  resizeCanvas();
   ctx.value = canvasRef.value.getContext("2d");
   if (!ctx.value) return;
   render();
+};
+
+const handleVisibilityChange = () => {
+  if (document.hidden && !!animationId.value) {
+    cancelAnimationFrame(animationId.value);
+    animationId.value = null;
+  } else {
+    render();
+  }
 };
 
 const clearCanvas = () => {

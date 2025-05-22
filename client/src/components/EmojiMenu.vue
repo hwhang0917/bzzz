@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useSound } from "@vueuse/sound";
-import { Github } from "lucide-vue-next";
 import { useHoverState } from "../composables/useHoverState";
 import { EMOJIS, type Emoji } from "../constants";
 import clickSfx from "../assets/click.wav";
@@ -44,7 +43,7 @@ const click = (emoji?: Emoji) => {
     </li>
     <li class="font-mono text-5xl text-stone-400 max-sm:hidden">|</li>
     <li
-      class="font-mono text-3xl duration-100 active:scale-150 max-sm:hidden md:text-5xl md:hover:scale-110 md:active:scale-125"
+      class="font-mono w-12 duration-100 active:scale-150 max-sm:hidden md:text-5xl md:hover:scale-110 md:active:scale-125"
       @mouseenter="onMouseEnter"
       @mouseleave="onMouseLeave"
       @click="() => click()"
@@ -53,8 +52,9 @@ const click = (emoji?: Emoji) => {
         href="https://github.com/hwhang0917/bzzz"
         target="_blank"
         aria-label="Go to Github link"
+        title="Github Link"
       >
-        <Github :size="48" />
+        <img src="/github-mark.svg" class="w-full" />
       </a>
     </li>
   </ul>
