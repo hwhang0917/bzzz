@@ -1,13 +1,6 @@
 <script setup lang="ts">
 import Color from "color";
-import {
-  computed,
-  onBeforeUnmount,
-  onMounted,
-  reactive,
-  ref,
-  watch,
-} from "vue";
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { useWindowSize } from "@vueuse/core";
 import { useSound } from "@vueuse/sound";
 import bubbleSfx from "../assets/bubble.wav";
@@ -30,7 +23,7 @@ const rippleInterval = 30;
 
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const ctx = ref<CanvasRenderingContext2D | null>();
-const animationId = ref<number>();
+const animationId = ref<number | null>(null);
 const isRippling = ref<boolean>(false);
 const position = reactive<Position>({ x: 0, y: 0 });
 const currentRippleSize = ref<number>(0);
@@ -42,24 +35,39 @@ const { width, height } = useWindowSize();
 
 onMounted(() => {
   initCanvas();
+  document.addEventListener("visibilitychange", handleVisibilityChange);
 });
-onBeforeUnmount(() => {
+onUnmounted(() => {
   if (animationId.value) cancelAnimationFrame(animationId.value);
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
 });
+
+const resizeCanvas = () => {
+  if (!canvasRef.value) return;
+  canvasRef.value.width = width.value;
+  canvasRef.value.height = height.value;
+};
+watch([width, height], resizeCanvas);
 
 const initCanvas = () => {
   if (!canvasRef.value) {
     console.error("Canvas element not found.");
     return;
   }
-  console.log(rippleColor.value);
-  canvasRef.value.width = width.value;
-  canvasRef.value.height = height.value;
+  resizeCanvas();
   ctx.value = canvasRef.value.getContext("2d");
   if (!ctx.value) return;
   ctx.value.lineCap = "round";
   ctx.value.lineJoin = "round";
   render(0);
+};
+const handleVisibilityChange = () => {
+  if (animationId.value) {
+    cancelAnimationFrame(animationId.value);
+    animationId.value = null;
+  } else {
+    render(0);
+  }
 };
 const updatePosition = (clientX: number, clientY: number) => {
   if (!canvasRef.value) return;
@@ -97,7 +105,7 @@ const stopRippling = (e: unknown) => {
   currentRippleSize.value = 0;
   stop();
 };
-const changePosition = (e: MouseEvent | TouchEvent) => {
+const changePosition = (e: MouseEvent) => {
   clearCanvas();
   if (!canvasRef.value) {
     position.x = 0;
@@ -106,14 +114,13 @@ const changePosition = (e: MouseEvent | TouchEvent) => {
   }
 
   let clientX, clientY;
-  if (e instanceof MouseEvent) {
-    clientX = e.clientX;
-    clientY = e.clientY;
-  } else {
+  if (typeof TouchEvent !== "undefined" && e instanceof TouchEvent) {
     clientX = e.touches[0]?.clientX || 0;
     clientY = e.touches[0]?.clientY || 0;
+  } else {
+    clientX = e.clientX;
+    clientY = e.clientY;
   }
-
   updatePosition(clientX, clientY);
 };
 const drawRipple = (size: number) => {

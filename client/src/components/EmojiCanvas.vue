@@ -10,10 +10,16 @@ const EMOJI_SCALE = 1.9;
 const VERTICAL_OFFSET = -0.18;
 const BALL_LIFETIME_MS = 7_000;
 
+const SHADOW_COLOR = "rgba(0, 0, 0, 0.3)";
+const SHADOW_BLUR = 6;
+const SHADOW_OFFSET_X = 2;
+const SHADOW_OFFSET_Y = 2;
+
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const ctx = ref<CanvasRenderingContext2D | null>();
 const animationId = ref<number | null>(null);
 const emojiBalls = ref<Array<Ball<string>>>([]);
+const timestamp = ref<number>(0);
 
 onMounted(() => {
   initCanvas();
@@ -47,7 +53,7 @@ const initCanvas = () => {
   resizeCanvas();
   ctx.value = canvasRef.value.getContext("2d");
   if (!ctx.value) return;
-  render();
+  render(0);
 };
 
 const handleVisibilityChange = () => {
@@ -55,7 +61,7 @@ const handleVisibilityChange = () => {
     cancelAnimationFrame(animationId.value);
     animationId.value = null;
   } else {
-    render();
+    render(0);
   }
 };
 
@@ -68,6 +74,11 @@ const drawBall = (ball: Ball<string>, debug = false) => {
 
   const fontSize = ball.radius * EMOJI_SCALE;
   ctx.value.font = `${fontSize}px Noto Color Emoji`;
+
+  ctx.value.shadowColor = SHADOW_COLOR;
+  ctx.value.shadowBlur = SHADOW_BLUR;
+  ctx.value.shadowOffsetX = SHADOW_OFFSET_X;
+  ctx.value.shadowOffsetY = SHADOW_OFFSET_Y;
 
   ctx.value.globalAlpha = ball.opacity;
 
@@ -89,6 +100,11 @@ const drawBall = (ball: Ball<string>, debug = false) => {
     ball.y + textHeight / 2 + verticalAdjustment,
   );
 
+  ctx.value.shadowColor = "transparent";
+  ctx.value.shadowBlur = 0;
+  ctx.value.shadowOffsetX = 0;
+  ctx.value.shadowOffsetY = 0;
+
   ctx.value.globalAlpha = 1.0;
 
   // DEBUG
@@ -99,12 +115,12 @@ const drawBall = (ball: Ball<string>, debug = false) => {
     ctx.value.stroke();
   }
 };
-const render = () => {
+const render = (ts: number) => {
+  timestamp.value = ts;
   if (!canvasRef.value || !ctx.value) return;
   clearCanvas();
-  const currentTime = Date.now();
   emojiBalls.value = emojiBalls.value.filter((ball) => {
-    const age = currentTime - ball.createdAt;
+    const age = ts - ball.createdAt;
     if (age > BALL_LIFETIME_MS * 0.75) {
       const remainingLifePercentage =
         1 - (age - BALL_LIFETIME_MS * 0.75) / (BALL_LIFETIME_MS * 0.25);
@@ -144,6 +160,7 @@ const dropEmoji = (emoji: Emoji) => {
       canvasWidth: canvasRef.value.width,
       canvasHeight: canvasRef.value.height,
       content: emoji.value,
+      createdAt: timestamp.value,
     }),
   );
 };

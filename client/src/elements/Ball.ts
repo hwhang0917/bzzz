@@ -5,6 +5,7 @@ interface BallOption<T> {
   canvasWidth: number;
   canvasHeight: number;
   content: T;
+  createdAt: number;
 }
 
 class Ball<T = unknown> {
@@ -18,16 +19,16 @@ class Ball<T = unknown> {
   public readonly content: T;
   public readonly createdAt: number;
 
-  constructor({ radius, canvasWidth, content }: BallOption<T>) {
+  constructor({ radius, canvasWidth, content, createdAt }: BallOption<T>) {
     this.x = randomInt(radius, canvasWidth - radius);
-    this.y = 0;
-    this.dx = randomInt(-1, 1);
-    this.dy = randomInt(-1, 1);
+    this.y = -100;
+    this.dx = randomInt(-2, 2);
+    this.dy = randomInt(-2, 2);
     this.rotation = randomInt(0, 360);
     this.opacity = 1.0;
     this.radius = radius;
     this.content = content;
-    this.createdAt = Date.now();
+    this.createdAt = createdAt;
   }
 }
 
