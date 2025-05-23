@@ -28,7 +28,7 @@ const click = (idx?: number) => {
     navigator.vibrate(50);
   }
   play({ playbackRate: 1.5 });
-  if (idx) {
+  if (typeof idx !== "undefined") {
     emit("dispatchEmoji", EMOJIS[idx]);
     ws.send(idx.toString());
   }
