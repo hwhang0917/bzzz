@@ -4,7 +4,9 @@
 
 > Socket based realtime buzzing application for fun
 
-![demo image](./assets/demo.gif)
+<div align="center">
+<img src="./assets/demo.gif" width="400">
+</div>
 
 ## Prerequisite
 
