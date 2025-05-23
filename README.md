@@ -4,6 +4,8 @@
 
 > Socket based realtime buzzing application for fun
 
+![demo image](./assets/demo.gif)
+
 ## Prerequisite
 
 - Node.js (^22.14.0)
