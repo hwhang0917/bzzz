@@ -41,7 +41,7 @@ const click = (idx?: number) => {
   >
     <li v-for="(emoji, idx) in EMOJIS" class="font-emoji text-3xl md:text-5xl">
       <button
-        class="my-2 cursor-pointer duration-100 active:scale-150 md:my-0 md:hover:scale-110 md:active:scale-125"
+        class="my-2 duration-100 active:scale-150 md:my-0 md:hover:scale-110 md:active:scale-125"
         :aria-label="`Send ${emoji.value} emoji to others (${emoji.descriptor}).`"
         :title="emoji.descriptor"
         @mouseenter="onMouseEnter"

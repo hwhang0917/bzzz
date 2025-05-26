@@ -33,3 +33,12 @@ provideHoverState();
   </main>
   <Footer />
 </template>
+
+<style lang="css">
+canvas, div {
+    cursor: url(cursor.png) 10 0, auto;
+}
+button:hover, a:hover {
+    cursor: url(pointer.png) 10 0, auto;
+}
+</style>
