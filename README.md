@@ -13,10 +13,11 @@
 - Node.js (^22.14.0)
 - NPM (^11.3.0)
 - Go (^1.24.1)
+- Docker (^28.1.0) (Optional)
 
 - [Make](https://www.gnu.org/software/make/) (Optional)
 
-## Build guide
+## Build guide (For Development)
 
 1. Clone this repository
 
@@ -41,6 +42,26 @@ cd client && npm ci && npm run build
 
 # Build server
 go build -o build/server main.go
+```
+
+## Docker Guide
+
+1. Clone this repository
+
+```sh
+git clone https://github.com/hwhang0917/bzzz.git
+```
+
+2. Build Docker Image
+
+```sh
+docker build -t bzzz .
+```
+
+3. Run Docker container
+
+```sh
+docker run -d -p 8080:8080 bzzz
 ```
 
 ## TODO
