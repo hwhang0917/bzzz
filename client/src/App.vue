@@ -36,9 +36,9 @@ provideHoverState();
 
 <style lang="css">
 canvas, div {
-    cursor: url(cursor.png) 10 0, auto;
+    cursor: url(assets/cursor.png) 10 0, auto;
 }
 button:hover, a:hover {
-    cursor: url(pointer.png) 10 0, auto;
+    cursor: url(assets/pointer.png) 10 0, auto;
 }
 </style>
