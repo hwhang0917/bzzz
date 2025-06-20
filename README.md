@@ -5,8 +5,7 @@
 > Socket based realtime buzzing application for fun
 
 <div align="center">
-<img src="./assets/demo.gif" width="400">
-
+    <img src="./assets/demo.gif" width="400">
 </div>
 
 
