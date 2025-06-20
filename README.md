@@ -7,8 +7,6 @@
 <div align="center">
 <img src="./assets/demo.gif" width="400">
 
-[Checkout demo website](https://bzzz.runfridge.dev/)
-
 </div>
 
 
